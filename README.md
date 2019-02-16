@@ -1,1 +1,3 @@
-# Slave\n\nA simple discord bot written in rust
+# Slave
+
+A simple discord bot written in rust
