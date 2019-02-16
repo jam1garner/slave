@@ -1,0 +1,10 @@
+[package]
+name = "discord_bot"
+version = "0.1.0"
+authors = ["jam1garner <jam1.mcleod@hotmail.com>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+lazy_static = "1"
+serenity = "0.5"
