@@ -1,6 +1,9 @@
 #[macro_use] extern crate lazy_static;
 extern crate serenity;
 extern crate regex;
+extern crate reqwest;
+
+mod twitter_pics;
 
 use std::env;
 use std::sync::{Arc, Mutex};
@@ -10,7 +13,7 @@ use regex::Regex;
 use serenity::{
     model::{channel::Message, gateway::Ready, id::ChannelId},
     prelude::*,
-    utils::MessageBuilder,
+    utils::{MessageBuilder, Colour},
 };
 
 struct Handler {
@@ -79,6 +82,30 @@ impl EventHandler for Handler {
             
             let url = last_match[0].to_string();
             current_links.insert(msg.channel_id, url);
+        }
+
+        if msg.content.starts_with("!pics") {
+            let link_data = Arc::clone(&self.current_links);
+            let current_links = link_data.lock().unwrap();
+            
+            match current_links.get(&msg.channel_id) {
+                Some(link) => {
+                    for pic_url in twitter_pics::get_image_urls(link).iter().skip(1) {
+                        msg.channel_id.send_message(|m| m
+                            .embed(|e| e
+                                .title("Additional tweet pics")
+                                .image(pic_url)
+                                .colour(Colour::from_rgb(0, 172, 237))
+                        ));
+                    }
+                } 
+                None =>
+                {
+                    msg.channel_id.send_message(|m| m
+                        .content("No link found for current channel".to_string())
+                    );
+                }
+            };
         }
     }
 
